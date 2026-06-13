@@ -1,0 +1,42 @@
+name: 🛠️ Task
+description: A concrete development task (for maintainers and contributors)
+title: "<type>: <short description>"
+labels: ["type: task"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to be done and why.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: A checklist that defines "done".
+      value: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Tasks
+        - Notes
+        - Finance
+        - Notifications / reminders
+        - Backend / API
+        - Frontend
+        - Infrastructure / tooling
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Implementation notes
+    validations:
+      required: false
