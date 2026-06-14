@@ -9,3 +9,14 @@ updates:
     labels:
       - "type: chore"
       - "dependencies"
+
+  - package-ecosystem: "gomod"
+    directory: "/server"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+    labels:
+      - "type: chore"
+      - "area: backend"
+      - "dependencies"
