@@ -34,3 +34,13 @@ src/
 
 > The UI currently runs on mock data. It will be wired to the Go API once the
 > architecture ADR (issue #4) is in place.
+
+## Icons
+
+All favicons, PWA and maskable icons are generated from a single master
+(`scripts/icon-master.png`). Regenerate them after changing the art:
+
+```bash
+pip install Pillow
+python scripts/generate-icons.py
+```
