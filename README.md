@@ -53,16 +53,16 @@ with your phone in your pocket.
 
 No WhatsApp Business API, no third-party fees — just your own number.
 
-## 🛠️ Tech stack (being finalized)
+## 🛠️ Tech stack
 
-The architecture is intentionally kept **simple**. The proposed stack:
+Kept intentionally **simple** — full rationale in [ADR 0001](docs/adr/0001-architecture.md):
 
-- **Frontend:** React + Tailwind + shadcn/ui, packaged for Android with Capacitor (also a PWA)
-- **Backend:** Go + SQLite
-- **Reminders:** self-hosted whatsmeow endpoint
+- **Frontend:** React + Vite + TypeScript + Tailwind + shadcn/ui — packaged for Android with Capacitor (also a PWA)
+- **Backend:** a single **Go** binary (REST API + reminder scheduler)
+- **Database:** **SQLite** — one file, zero-ops
+- **Reminders:** server-driven, delivered through your self-hosted **whatsmeow** endpoint, so they arrive even with the app closed
 
-> 📌 The architecture decision is being captured as an ADR — see the
-> [open issues](../../issues).
+> 📐 Architecture & decisions live in [`docs/adr/`](docs/adr/).
 
 ## 🚀 Getting started
 
