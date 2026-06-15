@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { api } from "@/lib/api"
-import type { NewTask, Task } from "@/types"
+import type { NewTask, Task, TaskPatch } from "@/types"
 
 export interface UseTasks {
   tasks: Task[]
@@ -9,6 +9,7 @@ export interface UseTasks {
   error: string | null
   reload: () => void
   addTask: (input: NewTask) => Promise<void>
+  updateTask: (id: string, patch: TaskPatch) => Promise<Task>
   toggleComplete: (task: Task) => Promise<void>
   removeTask: (id: string) => Promise<void>
 }
@@ -37,6 +38,12 @@ export function useTasks(): UseTasks {
     setTasks((prev) => [created, ...prev])
   }, [])
 
+  const updateTask = useCallback(async (id: string, patch: TaskPatch) => {
+    const updated = await api.updateTask(id, patch)
+    setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
+    return updated
+  }, [])
+
   const toggleComplete = useCallback(async (task: Task) => {
     const updated = await api.updateTask(task.id, { completed: task.completedAt == null })
     setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
@@ -47,7 +54,7 @@ export function useTasks(): UseTasks {
     setTasks((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
-  return { tasks, loading, error, reload, addTask, toggleComplete, removeTask }
+  return { tasks, loading, error, reload, addTask, updateTask, toggleComplete, removeTask }
 }
 
 function errorMessage(err: unknown): string {

@@ -1,10 +1,13 @@
+import { useState } from "react"
 import { Bell, Loader2 } from "lucide-react"
 
 import { QuickAdd } from "@/components/tasks/QuickAdd"
 import { TaskList } from "@/components/tasks/TaskList"
+import { TaskSheet } from "@/components/tasks/TaskSheet"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useTasks } from "@/hooks/use-tasks"
+import type { Task } from "@/types"
 
 const NAME = "Rudhery"
 
@@ -38,7 +41,9 @@ function ProgressRing({ value }: { value: number }) {
 }
 
 export function TasksPage() {
-  const { tasks, loading, error, reload, addTask, toggleComplete } = useTasks()
+  const { tasks, loading, error, reload, addTask, updateTask, toggleComplete, removeTask } =
+    useTasks()
+  const [editing, setEditing] = useState<Task | null>(null)
 
   const now = new Date()
   const dateLabel = now.toLocaleDateString("en-US", {
@@ -103,13 +108,27 @@ export function TasksPage() {
         ) : loading ? (
           <LoadingState />
         ) : (
-          <TaskList tasks={tasks} onToggle={(task) => void toggleComplete(task)} />
+          <TaskList
+            tasks={tasks}
+            onToggle={(task) => void toggleComplete(task)}
+            onEdit={setEditing}
+          />
         )}
       </section>
 
       <div className="animate-rise" style={{ animationDelay: "200ms" }}>
         <QuickAdd onAdd={addTask} />
       </div>
+
+      <TaskSheet
+        task={editing}
+        open={editing != null}
+        onOpenChange={(o) => {
+          if (!o) setEditing(null)
+        }}
+        onSave={updateTask}
+        onDelete={removeTask}
+      />
     </div>
   )
 }
