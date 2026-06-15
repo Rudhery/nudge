@@ -1,6 +1,7 @@
 import { useState } from "react"
 
 import { AppShell } from "@/components/layout/AppShell"
+import { Toaster } from "@/components/ui/sonner"
 import { useTheme } from "@/hooks/use-theme"
 import { FinancePage } from "@/pages/FinancePage"
 import { NotesPage } from "@/pages/NotesPage"
@@ -12,15 +13,18 @@ export default function App() {
   const { theme, toggle } = useTheme()
 
   return (
-    <AppShell
-      active={active}
-      onSelect={setActive}
-      theme={theme}
-      onToggleTheme={toggle}
-    >
-      {active === "tasks" && <TasksPage />}
-      {active === "notes" && <NotesPage />}
-      {active === "finance" && <FinancePage />}
-    </AppShell>
+    <>
+      <AppShell
+        active={active}
+        onSelect={setActive}
+        theme={theme}
+        onToggleTheme={toggle}
+      >
+        {active === "tasks" && <TasksPage />}
+        {active === "notes" && <NotesPage />}
+        {active === "finance" && <FinancePage />}
+      </AppShell>
+      <Toaster theme={theme} />
+    </>
   )
 }
