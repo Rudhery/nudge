@@ -36,7 +36,7 @@ export function TaskSheet({
   open: boolean
   onOpenChange: (open: boolean) => void
   onSave: (id: string, patch: TaskPatch) => Promise<unknown>
-  onDelete: (id: string) => Promise<unknown>
+  onDelete: (task: Task) => Promise<unknown>
 }) {
   const isDesktop = useMediaQuery("(min-width: 768px)")
   const [title, setTitle] = useState("")
@@ -77,7 +77,7 @@ export function TaskSheet({
     if (!task) return
     setBusy(true)
     try {
-      await onDelete(task.id)
+      await onDelete(task)
       onOpenChange(false)
     } finally {
       setBusy(false)

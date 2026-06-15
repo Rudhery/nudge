@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Bell, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 import { QuickAdd } from "@/components/tasks/QuickAdd"
 import { TaskSections } from "@/components/tasks/TaskSections"
@@ -41,7 +42,7 @@ function ProgressRing({ value }: { value: number }) {
 }
 
 export function TasksPage() {
-  const { tasks, loading, error, reload, addTask, updateTask, toggleComplete, removeTask } =
+  const { tasks, loading, error, reload, addTask, updateTask, setCompleted, removeTask } =
     useTasks()
   const [editing, setEditing] = useState<Task | null>(null)
 
@@ -57,6 +58,35 @@ export function TasksPage() {
   const pending = total - done
   const reminders = tasks.filter((t) => t.remindAt != null && t.completedAt == null).length
   const pct = total === 0 ? 0 : Math.round((done / total) * 100)
+
+  async function handleToggle(task: Task) {
+    const wasDone = task.completedAt != null
+    await setCompleted(task.id, !wasDone)
+    if (!wasDone) {
+      toast.success("Task completed", {
+        duration: 6000,
+        action: { label: "Undo", onClick: () => void setCompleted(task.id, false) },
+      })
+    }
+  }
+
+  async function handleDelete(task: Task) {
+    await removeTask(task.id)
+    toast("Task deleted", {
+      duration: 6000,
+      action: {
+        label: "Undo",
+        onClick: () =>
+          void addTask({
+            title: task.title,
+            notes: task.notes,
+            priority: task.priority,
+            dueAt: task.dueAt ?? null,
+            remindAt: task.remindAt ?? null,
+          }),
+      },
+    })
+  }
 
   return (
     <div className="space-y-6">
@@ -103,8 +133,9 @@ export function TasksPage() {
         ) : (
           <TaskSections
             tasks={tasks}
-            onToggle={(task) => void toggleComplete(task)}
+            onToggle={handleToggle}
             onEdit={setEditing}
+            onDelete={handleDelete}
           />
         )}
       </section>
@@ -120,7 +151,7 @@ export function TasksPage() {
           if (!o) setEditing(null)
         }}
         onSave={updateTask}
-        onDelete={removeTask}
+        onDelete={handleDelete}
       />
     </div>
   )
