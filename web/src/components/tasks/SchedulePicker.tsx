@@ -1,14 +1,20 @@
 import { useState } from "react"
-import { CalendarClock, X } from "lucide-react"
+import { CalendarClock, Clock, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
-import { Input } from "@/components/ui/input"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   Sheet,
   SheetContent,
@@ -20,6 +26,8 @@ import {
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { presets, scheduleLabel } from "@/lib/schedule"
 import { cn } from "@/lib/utils"
+
+const MINUTES = Array.from({ length: 12 }, (_, i) => i * 5)
 
 function pad(n: number): string {
   return n.toString().padStart(2, "0")
@@ -110,15 +118,6 @@ function ScheduleFields({
     onChange(next)
   }
 
-  function setTime(raw: string) {
-    const [h, m] = raw.split(":").map(Number)
-    const base = value ? new Date(value) : new Date()
-    base.setHours(h || 0, m || 0, 0, 0)
-    onChange(base)
-  }
-
-  const timeValue = value ? `${pad(value.getHours())}:${pad(value.getMinutes())}` : ""
-
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-1.5">
@@ -143,14 +142,8 @@ function ScheduleFields({
         <Calendar mode="single" selected={value ?? undefined} onSelect={pickDay} initialFocus />
       </div>
 
-      <div className="flex items-center gap-2">
-        <Input
-          type="time"
-          value={timeValue}
-          onChange={(e) => setTime(e.target.value)}
-          aria-label="Reminder time"
-          className="h-10"
-        />
+      <div className="flex items-center justify-between gap-2 border-t border-border pt-3">
+        <TimeField value={value} onChange={onChange} />
         {value && (
           <Button
             type="button"
@@ -167,6 +160,55 @@ function ScheduleFields({
           </Button>
         )}
       </div>
+    </div>
+  )
+}
+
+function TimeField({
+  value,
+  onChange,
+}: {
+  value: Date | null
+  onChange: (date: Date) => void
+}) {
+  const base = value ?? defaultTime()
+  const hour = base.getHours()
+  const minute = (Math.round(base.getMinutes() / 5) * 5) % 60
+
+  function set(h: number, m: number) {
+    const next = value ? new Date(value) : defaultTime()
+    next.setHours(h, m, 0, 0)
+    onChange(next)
+  }
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <Clock className="size-4 shrink-0 text-muted-foreground" />
+      <Select value={String(hour)} onValueChange={(v) => set(Number(v), minute)}>
+        <SelectTrigger className="h-10 w-[4.25rem]" aria-label="Hour">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="max-h-56">
+          {Array.from({ length: 24 }, (_, h) => (
+            <SelectItem key={h} value={String(h)}>
+              {pad(h)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <span className="text-muted-foreground">:</span>
+      <Select value={String(minute)} onValueChange={(v) => set(hour, Number(v))}>
+        <SelectTrigger className="h-10 w-[4.25rem]" aria-label="Minute">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="max-h-56">
+          {MINUTES.map((m) => (
+            <SelectItem key={m} value={String(m)}>
+              {pad(m)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   )
 }
