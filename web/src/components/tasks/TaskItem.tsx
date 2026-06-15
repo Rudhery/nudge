@@ -15,9 +15,11 @@ const priorityStyles: Record<Priority, { dot: string; label: string }> = {
 export function TaskItem({
   task,
   onToggle,
+  onEdit,
 }: {
   task: Task
   onToggle: (task: Task) => void
+  onEdit: (task: Task) => void
 }) {
   const p = priorityStyles[task.priority]
   const done = task.completedAt != null
@@ -32,22 +34,21 @@ export function TaskItem({
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
       <div
-        role="button"
-        tabIndex={0}
-        onClick={() => onToggle(task)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault()
-            onToggle(task)
-          }
-        }}
         className={cn(
-          "group flex cursor-pointer select-none items-center gap-3.5 rounded-lg border border-border/70 bg-card px-4 py-3.5 shadow-soft transition-all hover:border-border hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background",
+          "group flex items-center gap-3.5 rounded-lg border border-border/70 bg-card px-4 py-3.5 shadow-soft transition-all hover:border-border hover:shadow-lift",
           done && "opacity-60",
         )}
       >
-        <Checkbox checked={done} tabIndex={-1} className="pointer-events-none" />
-        <div className="min-w-0 flex-1">
+        <Checkbox
+          checked={done}
+          onCheckedChange={() => onToggle(task)}
+          aria-label={done ? "Mark as not done" : "Mark as done"}
+        />
+        <button
+          type="button"
+          onClick={() => onEdit(task)}
+          className="min-w-0 flex-1 rounded text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background"
+        >
           <p
             className={cn(
               "truncate text-[15px] font-medium leading-tight transition-colors",
@@ -77,7 +78,7 @@ export function TaskItem({
               </span>
             )}
           </div>
-        </div>
+        </button>
       </div>
     </motion.li>
   )

@@ -6,9 +6,11 @@ import type { Task } from "@/types"
 export function TaskList({
   tasks,
   onToggle,
+  onEdit,
 }: {
   tasks: Task[]
   onToggle: (task: Task) => void
+  onEdit: (task: Task) => void
 }) {
   if (tasks.length === 0) {
     return (
@@ -29,7 +31,7 @@ export function TaskList({
   return (
     <ul className="flex flex-col gap-2.5">
       {sorted.map((task) => (
-        <TaskItem key={task.id} task={task} onToggle={onToggle} />
+        <TaskItem key={task.id} task={task} onToggle={onToggle} onEdit={onEdit} />
       ))}
     </ul>
   )
