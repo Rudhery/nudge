@@ -28,12 +28,25 @@ src/
     tasks/       task list, item and quick-add
     ui/          shadcn/ui primitives
   pages/         one screen per module (Tasks, Notes, Finance)
-  data/          mock data (until the API is wired up)
-  lib/           helpers (cn, module config)
+  hooks/         data hooks (useTasks)
+  lib/           api client, helpers (cn), module config
 ```
 
-> The UI currently runs on mock data. It will be wired to the Go API once the
-> architecture ADR (issue #4) is in place.
+## Connecting to the API
+
+The Tasks screen talks to the Go backend. Start the server, then run the web app —
+Vite proxies `/api` to `http://localhost:8080` (see `vite.config.ts`).
+
+```bash
+# terminal 1 — backend
+cd ../server && go run ./cmd/nudge
+
+# terminal 2 — frontend
+npm run dev
+```
+
+Local overrides go in `.env.local` (see [`.env.example`](.env.example)); leave
+`VITE_API_URL` empty to use the dev proxy.
 
 ## Icons
 

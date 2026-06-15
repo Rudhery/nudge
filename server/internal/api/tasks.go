@@ -15,11 +15,12 @@ import (
 // taskInput is the request body for creating/updating a task. Pointer fields
 // let PATCH distinguish "not provided" from a zero value.
 type taskInput struct {
-	Title    *string        `json:"title"`
-	Notes    *string        `json:"notes"`
-	Priority *task.Priority `json:"priority"`
-	DueAt    *time.Time     `json:"dueAt"`
-	RemindAt *time.Time     `json:"remindAt"`
+	Title     *string        `json:"title"`
+	Notes     *string        `json:"notes"`
+	Priority  *task.Priority `json:"priority"`
+	DueAt     *time.Time     `json:"dueAt"`
+	RemindAt  *time.Time     `json:"remindAt"`
+	Completed *bool          `json:"completed"`
 }
 
 func (s *Server) handleListTasks(w http.ResponseWriter, r *http.Request) {
@@ -112,6 +113,15 @@ func (s *Server) handleUpdateTask(w http.ResponseWriter, r *http.Request) {
 	if in.RemindAt != nil {
 		t.RemindAt = in.RemindAt
 		t.RemindedAt = nil // re-arm the reminder
+	}
+	if in.Completed != nil {
+		switch {
+		case *in.Completed && t.CompletedAt == nil:
+			now := time.Now().UTC()
+			t.CompletedAt = &now
+		case !*in.Completed:
+			t.CompletedAt = nil
+		}
 	}
 	t.UpdatedAt = time.Now().UTC()
 

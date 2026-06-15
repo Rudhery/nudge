@@ -8,7 +8,7 @@ export function TaskList({
   onToggle,
 }: {
   tasks: Task[]
-  onToggle: (id: string) => void
+  onToggle: (task: Task) => void
 }) {
   if (tasks.length === 0) {
     return (
@@ -22,7 +22,9 @@ export function TaskList({
   }
 
   // Keep completed tasks at the bottom; layout animation handles the motion.
-  const sorted = [...tasks].sort((a, b) => Number(a.done) - Number(b.done))
+  const sorted = [...tasks].sort(
+    (a, b) => Number(a.completedAt != null) - Number(b.completedAt != null),
+  )
 
   return (
     <ul className="flex flex-col gap-2.5">

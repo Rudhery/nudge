@@ -4,15 +4,37 @@ export type Priority = "low" | "medium" | "high"
 
 export type ModuleId = "tasks" | "notes" | "finance"
 
+/** Mirrors the server's Task JSON (see server/internal/task). */
 export interface Task {
   id: string
   title: string
-  /** Human-friendly due time label, e.g. "09:30". */
-  due?: string
+  notes?: string
   priority: Priority
-  done: boolean
-  /** Whether a WhatsApp nudge is scheduled for this task. */
-  remind: boolean
+  dueAt?: string | null
+  remindAt?: string | null
+  remindedAt?: string | null
+  completedAt?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+/** Payload for creating a task. */
+export interface NewTask {
+  title: string
+  notes?: string
+  priority?: Priority
+  dueAt?: string | null
+  remindAt?: string | null
+}
+
+/** Partial update payload. */
+export interface TaskPatch {
+  title?: string
+  notes?: string
+  priority?: Priority
+  dueAt?: string | null
+  remindAt?: string | null
+  completed?: boolean
 }
 
 export interface ModuleDef {
