@@ -10,6 +10,7 @@ export interface UseTasks {
   reload: () => void
   addTask: (input: NewTask) => Promise<void>
   updateTask: (id: string, patch: TaskPatch) => Promise<Task>
+  setCompleted: (id: string, completed: boolean) => Promise<Task>
   toggleComplete: (task: Task) => Promise<void>
   removeTask: (id: string) => Promise<void>
 }
@@ -44,6 +45,12 @@ export function useTasks(): UseTasks {
     return updated
   }, [])
 
+  const setCompleted = useCallback(async (id: string, completed: boolean) => {
+    const updated = await api.updateTask(id, { completed })
+    setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
+    return updated
+  }, [])
+
   const toggleComplete = useCallback(async (task: Task) => {
     const updated = await api.updateTask(task.id, { completed: task.completedAt == null })
     setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
@@ -54,7 +61,17 @@ export function useTasks(): UseTasks {
     setTasks((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
-  return { tasks, loading, error, reload, addTask, updateTask, toggleComplete, removeTask }
+  return {
+    tasks,
+    loading,
+    error,
+    reload,
+    addTask,
+    updateTask,
+    setCompleted,
+    toggleComplete,
+    removeTask,
+  }
 }
 
 function errorMessage(err: unknown): string {

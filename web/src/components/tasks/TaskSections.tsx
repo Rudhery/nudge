@@ -10,10 +10,12 @@ export function TaskSections({
   tasks,
   onToggle,
   onEdit,
+  onDelete,
 }: {
   tasks: Task[]
   onToggle: (task: Task) => void
   onEdit: (task: Task) => void
+  onDelete: (task: Task) => void
 }) {
   if (tasks.length === 0) {
     return (
@@ -48,7 +50,13 @@ export function TaskSections({
             </div>
             <ul className="flex flex-col gap-2.5">
               {group.tasks.map((task) => (
-                <TaskItem key={task.id} task={task} onToggle={onToggle} onEdit={onEdit} />
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  onToggle={onToggle}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                />
               ))}
             </ul>
           </section>
