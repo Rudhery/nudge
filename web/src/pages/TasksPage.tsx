@@ -1,11 +1,10 @@
-import { useState } from "react"
-import { Bell } from "lucide-react"
+import { Bell, Loader2 } from "lucide-react"
 
 import { QuickAdd } from "@/components/tasks/QuickAdd"
 import { TaskList } from "@/components/tasks/TaskList"
+import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { initialTasks } from "@/data/tasks"
-import type { Task } from "@/types"
+import { useTasks } from "@/hooks/use-tasks"
 
 const NAME = "Rudhery"
 
@@ -21,14 +20,7 @@ function ProgressRing({ value }: { value: number }) {
   const circumference = 2 * Math.PI * r
   return (
     <svg viewBox="0 0 64 64" className="size-16 -rotate-90">
-      <circle
-        cx="32"
-        cy="32"
-        r={r}
-        fill="none"
-        stroke="hsl(var(--muted))"
-        strokeWidth="6"
-      />
+      <circle cx="32" cy="32" r={r} fill="none" stroke="hsl(var(--muted))" strokeWidth="6" />
       <circle
         cx="32"
         cy="32"
@@ -46,7 +38,7 @@ function ProgressRing({ value }: { value: number }) {
 }
 
 export function TasksPage() {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks)
+  const { tasks, loading, error, reload, addTask, toggleComplete } = useTasks()
 
   const now = new Date()
   const dateLabel = now.toLocaleDateString("en-US", {
@@ -56,37 +48,17 @@ export function TasksPage() {
   })
 
   const total = tasks.length
-  const done = tasks.filter((t) => t.done).length
+  const done = tasks.filter((t) => t.completedAt != null).length
   const pending = total - done
-  const reminders = tasks.filter((t) => t.remind && !t.done).length
+  const reminders = tasks.filter((t) => t.remindAt != null && t.completedAt == null).length
   const pct = total === 0 ? 0 : Math.round((done / total) * 100)
-
-  function toggle(id: string) {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
-    )
-  }
-
-  function add(title: string) {
-    setTasks((prev) => [
-      {
-        id: crypto.randomUUID(),
-        title,
-        priority: "medium",
-        done: false,
-        remind: false,
-      },
-      ...prev,
-    ])
-  }
 
   return (
     <div className="space-y-6">
       <header className="animate-rise">
         <p className="text-sm font-medium text-muted-foreground">{dateLabel}</p>
         <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight text-balance md:text-[2.1rem]">
-          {greetingFor(now)},{" "}
-          <span className="italic text-primary">{NAME}</span>
+          {greetingFor(now)}, <span className="italic text-primary">{NAME}</span>
         </h1>
         <p className="mt-1.5 text-[15px] text-muted-foreground">
           {pending === 0
@@ -97,16 +69,11 @@ export function TasksPage() {
         </p>
       </header>
 
-      <Card
-        className="animate-rise overflow-hidden"
-        style={{ animationDelay: "70ms" }}
-      >
+      <Card className="animate-rise overflow-hidden" style={{ animationDelay: "70ms" }}>
         <div className="flex items-center gap-5 p-5">
           <div className="relative grid shrink-0 place-items-center">
             <ProgressRing value={total === 0 ? 0 : done / total} />
-            <span className="absolute text-sm font-semibold tabular-nums">
-              {pct}%
-            </span>
+            <span className="absolute text-sm font-semibold tabular-nums">{pct}%</span>
           </div>
           <div className="min-w-0">
             <p className="font-display text-lg font-semibold">
@@ -117,7 +84,7 @@ export function TasksPage() {
             </p>
             <div className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-primary">
               <Bell className="size-3.5" />
-              {reminders} WhatsApp {reminders === 1 ? "nudge" : "nudges"} today
+              {reminders} {reminders === 1 ? "reminder" : "reminders"} today
             </div>
           </div>
         </div>
@@ -130,12 +97,41 @@ export function TasksPage() {
             {done}/{total} done
           </span>
         </div>
-        <TaskList tasks={tasks} onToggle={toggle} />
+
+        {error ? (
+          <ErrorState message={error} onRetry={reload} />
+        ) : loading ? (
+          <LoadingState />
+        ) : (
+          <TaskList tasks={tasks} onToggle={(task) => void toggleComplete(task)} />
+        )}
       </section>
 
       <div className="animate-rise" style={{ animationDelay: "200ms" }}>
-        <QuickAdd onAdd={add} />
+        <QuickAdd onAdd={(title) => addTask({ title })} />
       </div>
+    </div>
+  )
+}
+
+function LoadingState() {
+  return (
+    <div className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-border py-12 text-sm text-muted-foreground">
+      <Loader2 className="size-4 animate-spin" />
+      Loading tasks…
+    </div>
+  )
+}
+
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-destructive/40 bg-destructive/5 py-10 text-center">
+      <p className="px-4 text-sm text-muted-foreground">
+        Couldn&apos;t load tasks: {message}
+      </p>
+      <Button variant="outline" size="sm" onClick={onRetry}>
+        Try again
+      </Button>
     </div>
   )
 }

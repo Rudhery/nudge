@@ -2,6 +2,7 @@ import { motion } from "framer-motion"
 import { Bell, Clock } from "lucide-react"
 
 import { Checkbox } from "@/components/ui/checkbox"
+import { timeLabel } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { Priority, Task } from "@/types"
 
@@ -16,9 +17,12 @@ export function TaskItem({
   onToggle,
 }: {
   task: Task
-  onToggle: (id: string) => void
+  onToggle: (task: Task) => void
 }) {
   const p = priorityStyles[task.priority]
+  const done = task.completedAt != null
+  const remind = task.remindAt != null
+  const due = timeLabel(task.dueAt ?? task.remindAt)
 
   return (
     <motion.li
@@ -30,24 +34,24 @@ export function TaskItem({
       <div
         role="button"
         tabIndex={0}
-        onClick={() => onToggle(task.id)}
+        onClick={() => onToggle(task)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault()
-            onToggle(task.id)
+            onToggle(task)
           }
         }}
         className={cn(
           "group flex cursor-pointer select-none items-center gap-3.5 rounded-lg border border-border/70 bg-card px-4 py-3.5 shadow-soft transition-all hover:border-border hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background",
-          task.done && "opacity-60",
+          done && "opacity-60",
         )}
       >
-        <Checkbox checked={task.done} tabIndex={-1} className="pointer-events-none" />
+        <Checkbox checked={done} tabIndex={-1} className="pointer-events-none" />
         <div className="min-w-0 flex-1">
           <p
             className={cn(
               "truncate text-[15px] font-medium leading-tight transition-colors",
-              task.done && "text-muted-foreground line-through",
+              done && "text-muted-foreground line-through",
             )}
           >
             {task.title}
@@ -57,16 +61,16 @@ export function TaskItem({
               <span className={cn("size-1.5 rounded-full", p.dot)} />
               {p.label}
             </span>
-            {task.due && (
+            {due && (
               <>
                 <span className="text-border">·</span>
                 <span className="inline-flex items-center gap-1">
                   <Clock className="size-3" />
-                  {task.due}
+                  {due}
                 </span>
               </>
             )}
-            {task.remind && (
+            {remind && (
               <span className="inline-flex items-center gap-1 font-medium text-primary">
                 <Bell className="size-3" />
                 Nudge
