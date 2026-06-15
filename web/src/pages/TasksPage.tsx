@@ -108,7 +108,7 @@ export function TasksPage() {
       </section>
 
       <div className="animate-rise" style={{ animationDelay: "200ms" }}>
-        <QuickAdd onAdd={(title) => addTask({ title })} />
+        <QuickAdd onAdd={addTask} />
       </div>
     </div>
   )
