@@ -30,7 +30,8 @@ vendor/
 *.db-journal
 *.sqlite
 *.sqlite3
-data/
+# Backend runtime database directory (scoped, so source dirs named "data" are kept)
+/server/data/
 
 # ---- Capacitor / Android ----
 android/
