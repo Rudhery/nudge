@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Bell, Loader2 } from "lucide-react"
 
 import { QuickAdd } from "@/components/tasks/QuickAdd"
-import { TaskList } from "@/components/tasks/TaskList"
+import { TaskSections } from "@/components/tasks/TaskSections"
 import { TaskSheet } from "@/components/tasks/TaskSheet"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -96,19 +96,12 @@ export function TasksPage() {
       </Card>
 
       <section className="animate-rise" style={{ animationDelay: "140ms" }}>
-        <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="font-display text-lg font-semibold">Today</h2>
-          <span className="text-xs text-muted-foreground tabular-nums">
-            {done}/{total} done
-          </span>
-        </div>
-
         {error ? (
           <ErrorState message={error} onRetry={reload} />
         ) : loading ? (
           <LoadingState />
         ) : (
-          <TaskList
+          <TaskSections
             tasks={tasks}
             onToggle={(task) => void toggleComplete(task)}
             onEdit={setEditing}
