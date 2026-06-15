@@ -1,6 +1,7 @@
 import { motion } from "framer-motion"
-import { Bell, Moon, Sun } from "lucide-react"
+import { Moon, Sun } from "lucide-react"
 
+import { BrandMark } from "@/components/brand-mark"
 import { Button } from "@/components/ui/button"
 import { MODULES } from "@/lib/modules"
 import { cn } from "@/lib/utils"
@@ -17,8 +18,8 @@ const spring = { type: "spring", stiffness: 420, damping: 34 } as const
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <div className="grid size-9 place-items-center rounded-xl bg-foreground shadow-soft">
-        <Bell className="size-[18px] text-primary" />
+      <div className="size-9 overflow-hidden rounded-xl shadow-soft">
+        <BrandMark className="size-full" />
       </div>
       {!compact && (
         <span className="font-display text-xl font-semibold tracking-tight">
